@@ -186,6 +186,8 @@ class Player extends Body
 	constructor() {
 		super();
 
+		this.shotTime = 1;
+
 		// bind the input handler to this object
 		this.input_handler = new InputHandler(this);
 
@@ -194,6 +196,7 @@ class Player extends Body
 			x: config.canvas_size.width / 2,
 			y: config.canvas_size.height - 100
 		};
+		this.velocity = {x:this.speed,y:0}
 	}
 
 	/**
@@ -235,6 +238,18 @@ class Player extends Body
 		 */
 
 		this.move();
+
+		if(this.shotTime > 0 )
+			this.shotTime = this.shotTime - delta_time
+
+		if(this.shotTime < 0)
+			this.shotTime = 0
+
+		if(this.controller.action_1 && this.shotTime <= 0){
+			//console.log("hLELO")
+			new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y)
+			this.shotTime += 0.5
+		}
 		 
 
 		// update position
@@ -348,6 +363,7 @@ class Enemy extends Body {
 
 	}
 
+
 	update(delta_time) {
 		
 		this.velocity.y = this.speed
@@ -366,6 +382,61 @@ class Enemy extends Body {
 
 
 }
+/**
+* Represents an player body. Extends a Body by handling input binding and controller management.
+* 
+* @typedef laser
+*/
+class laser extends Body {
+	speed=200;
+
+	constructor(inx,iny,inVx,inVy){
+		super();
+
+		this.position = {
+			x: inx,
+			y: iny
+		};
+
+		//if(inVx==0)
+
+		this.velocity = {x: inVx/Math.abs(inVx+0.1)*this.speed,y: inVy/Math.abs(inVy+0.1)*this.speed}
+		console.log(this.velocity)
+	}
+
+	update(delta_time){
+		super.update(delta_time);
+
+		if(this.position.y > config.canvas_size.height || this.position.y < 0)
+			this.remove();
+		if(this.position.x > config.canvas_size.width || this.position.x < 0)
+			this.remove();
+	}
+
+	draw(graphics) {
+		let newx = this.position.x // this.half_size.width;
+		let newy = this.position.y // this.half_size.height;
+
+		graphics.save();
+		graphics.translate(newx, newy);
+		graphics.rotate(this.angle+Math.PI/2);
+		graphics.translate(-newx, -newy);
+
+		graphics.strokeStyle = '#FF0033';
+		graphics.beginPath();
+		graphics.arc(newx,newy,10,0,2*Math.PI)
+		graphics.stroke()
+
+			
+		graphics.restore();
+
+		// draw velocity lines
+		super.draw(graphics);
+	}
+		
+
+
+}
 
 class spawner {
 
@@ -379,12 +450,12 @@ class spawner {
 
 	update(delta_time) {
 		this.timespent += delta_time;
-		console.log(this.timespent)
+		//console.log(this.timespent)
 
 		if(this.timespent>3){
 			this.timespent=0;
 			for (let index = 0; index < 10; index++) {
-				entities.push(new Enemy())
+				new Enemy()
 			}
 		}
 
@@ -568,7 +639,9 @@ function loop(curr_time) {
 		last_time = curr_time;
 		loop_count++;
 
-		game_state.innerHTML = `loop count ${loop_count}`;
+		game_state.innerHTML = `loop count ${loop_count} <br />
+								Time till shot ${player.shotTime}`;
+		
 	}
 
 	window.requestAnimationFrame(loop);
@@ -579,7 +652,7 @@ function start() {
 	queued_entities_for_removal = [];
 	player = new Player();
 
-	entities[0] = player;
+	//entities[0] = player;
 	
 
 	enemy_spawner = new spawner()
