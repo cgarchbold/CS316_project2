@@ -3,11 +3,70 @@
 	<head>
 		<title>CS316 - PA2</title>
 	</head>
-	<body>
-		<div id="game_wrapper">
-			<canvas id="game_canvas" style="border: 1px solid black;margin: 0 auto;display: block;"></canvas>
-			<span id="game_state"></span>
+	<style>
+		* {
+		  box-sizing: border-box;
+		}
+		
+		/* Create two unequal columns that floats next to each other */
+		.column {
+		  float: left;
+		  padding: 10px;
+		  height: 300px; /* Should be removed. Only for demonstration */
+		}
+		
+		.left {
+		  width: 25%;
+		}
+		
+		.right {
+		  width: 75%;
+		}
+		
+		/* Clear floats after the columns */
+		.row:after {
+		  content: "";
+		  display: table;
+		  clear: both;
+		}
+	</style>
+	
+	<div class="row">
+		<div class="column">
+			<body>
+				<div id="game_wrapper">
+					<canvas id="game_canvas" style="border: 2px solid black;margin: 0 auto;display: block;"></canvas>
+					<span id="game_state"></span>
+				</div>
+			</body>
+			<script src="space_shooter.js"></script>
 		</div>
-	</body>
-	<script src="space_shooter.js"></script>
+
+		<div class="column">
+			<em> 
+				<font color="red" style="font-family: Chalkduster" size="5">
+					Space Game? Space Game.
+				</font>
+			</em>
+
+			<body bgcolor="black">
+
+			<em>
+				<font color ="white" size ="4">
+					<br /><br />How to play the Space Game?
+				</font>
+			</em>
+			<font color ="white" size ="3">
+				<br /><br /><b>WASD</b> - Up , Left , Down , Right
+				<br /><br /><b>Space</b> - Shoot
+			</font>
+			<em> 
+				
+			</em>
+			
+
+			</body>
+				
+		</div>
+	  </div>
 </html>

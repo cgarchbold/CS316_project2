@@ -514,6 +514,9 @@ shipImage.src = './ship.png';
 var enemyImage = new Image();
 enemyImage.src = './bat.gif'
 
+var bgImage = new Image();
+bgImage.src = './space.jpg'
+
 // for monitors with a higher dpi
 if (config.graphics.is_hi_dpi) {
 	game_canvas.width = 2 * config.canvas_size.width;
@@ -604,6 +607,7 @@ function draw(graphics) {
 	// draw background (this clears the screen for the next frame)
 	graphics.fillStyle = '#FFFFFF';
 	graphics.fillRect(0, 0, config.canvas_size.width, config.canvas_size.height);
+	graphics.drawImage(bgImage,0,0,config.canvas_size.width,config.canvas_size.height)
 
 	// for loop over every eneity and draw them
 	Object.values(entities).forEach(entity => {
@@ -650,11 +654,11 @@ function loop(curr_time) {
 		last_time = curr_time;
 		loop_count++;
 
-		game_state.innerHTML = `loop count ${loop_count} <br />
+		game_state.innerHTML = `<font color="red"> loop count ${loop_count} <br />
 								Time till next Shot: ${player.shotTime.toFixed(2)}<br />
 								Time Alive: ${player.timeAlive.toFixed(2)}<br />
 								Enemies killed: ${player.enemiesKilled}<br />
-								Score: ${player.score}`;
+								Score: ${player.score} <font>`;
 		
 	}
 
@@ -668,7 +672,7 @@ function start() {
 
 	//entities[0] = player;
 	
-	game_state.insertAdjacentHTML('afterend',`<br /> <pre>How to play the Game`)
+	//game_state.insertAdjacentHTML('afterend',`<br /> <pre>How to play the Game`)
 	enemy_spawner = new spawner()
 	
 	// collision_handler = your implementation
