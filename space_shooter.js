@@ -187,6 +187,9 @@ class Player extends Body
 		super();
 
 		this.shotTime = 1;
+		this.score = 0;
+		this.timeAlive=0;
+		this.enemiesKilled=0;
 
 		// bind the input handler to this object
 		this.input_handler = new InputHandler(this);
@@ -238,6 +241,8 @@ class Player extends Body
 		 */
 
 		this.move();
+
+		this.timeAlive+=delta_time;
 
 		if(this.shotTime > 0 )
 			this.shotTime = this.shotTime - delta_time
@@ -318,11 +323,13 @@ class Player extends Body
 */
 class Enemy extends Body {
 	speed = 50;
+	ticker;
 
 
 	constructor(){ 
 		super();
 
+		this.ticker = Math.random()*5;
 
 		//start enemies above the canvas
 		this.position = {
@@ -365,10 +372,14 @@ class Enemy extends Body {
 
 
 	update(delta_time) {
-		
-		this.velocity.y = this.speed
-		this.velocity.x = (Math.random() - 0.5)* 2 * this.speed;
 
+		this.ticker += delta_time;
+
+		if(this.ticker > 3){
+			this.velocity.y = this.speed*(Math.random()+0.1)
+			this.velocity.x = (Math.random() - 0.5)* 2 * this.speed;
+			this.ticker = 0;
+		}
 		// update position
 		super.update(delta_time);
 
@@ -452,9 +463,9 @@ class spawner {
 		this.timespent += delta_time;
 		//console.log(this.timespent)
 
-		if(this.timespent>3){
+		if(this.timespent>5){
 			this.timespent=0;
-			for (let index = 0; index < 10; index++) {
+			for (let index = 0; index < 5; index++) {
 				new Enemy()
 			}
 		}
@@ -640,7 +651,10 @@ function loop(curr_time) {
 		loop_count++;
 
 		game_state.innerHTML = `loop count ${loop_count} <br />
-								Time till shot ${player.shotTime}`;
+								Time till next Shot: ${player.shotTime.toFixed(2)}<br />
+								Time Alive: ${player.timeAlive.toFixed(2)}<br />
+								Enemies killed: ${player.enemiesKilled}<br />
+								Score: ${player.score}`;
 		
 	}
 
@@ -654,7 +668,7 @@ function start() {
 
 	//entities[0] = player;
 	
-
+	game_state.insertAdjacentHTML('afterend',`<br /> <pre>How to play the Game`)
 	enemy_spawner = new spawner()
 	
 	// collision_handler = your implementation
