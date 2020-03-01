@@ -173,7 +173,7 @@ class Player extends Body
 		action_1: false
 	};
 	raw_input = {};
-	speed = 150;
+	speed = 250;
 	input_handler = null;
 	angle = 0;
 
