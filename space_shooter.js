@@ -176,6 +176,7 @@ class Player extends Body
 	speed = 250;
 	input_handler = null;
 	angle = 0;
+	poweredUp = false;
 
 	
 
@@ -190,6 +191,7 @@ class Player extends Body
 		this.score = 0;
 		this.timeAlive=0;
 		this.enemiesKilled=0;
+		this.poweredUp = false;
 
 		// bind the input handler to this object
 		this.input_handler = new InputHandler(this);
@@ -252,7 +254,21 @@ class Player extends Body
 
 		if(this.controller.action_1 && this.shotTime <= 0){
 			//console.log("hLELO")
-			new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y)
+			if(!poweredUP)
+			new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, false)
+
+			//new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, true)
+			else{
+				let newvx = (this.velocity.x + this.velocity.y) / Math.sqrt(2)
+				let newvy = (this.velocity.y - this.velocity.x) / Math.sqrt(2)
+				let newvx2 = (this.velocity.x - this.velocity.y) / Math.sqrt(2)
+				let newvy2 = (this.velocity.y + this.velocity.x) / Math.sqrt(2)
+
+				new laser(this.position.x,this.position.y,newvx,newvy,this.angle+Math.Pi/4, true)
+				new laser(this.position.x,this.position.y,newvx2,newvy2,this.angle-Math.PI/4, true)
+				new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, true)
+			}
+
 			this.shotTime += 0.5
 		}
 		 
@@ -399,14 +415,19 @@ class Enemy extends Body {
 * @typedef laser
 */
 class laser extends Body {
-	speed=200;
+	speed=300;
+	angle=0;
+	isOrb=false;
 
-	constructor(inx,iny,inVx,inVy){
+	constructor(inx,iny,inVx,inVy,angle, isOrb){
 		super();
 
+		this.isOrb = isOrb;
+		this.angle = angle;
+
 		this.position = {
-			x: inx,
-			y: iny
+			x: inx + 0.05*inVx,
+			y: iny + 0.05*inVy
 		};
 
 		//if(inVx==0)
@@ -430,13 +451,19 @@ class laser extends Body {
 
 		graphics.save();
 		graphics.translate(newx, newy);
-		graphics.rotate(this.angle+Math.PI/2);
+		graphics.rotate(this.angle) //Math.PI/2);
 		graphics.translate(-newx, -newy);
 
-		graphics.strokeStyle = '#FF0033';
-		graphics.beginPath();
-		graphics.arc(newx,newy,10,0,2*Math.PI)
-		graphics.stroke()
+		if(this.isOrb){
+			graphics.drawImage(orbImage,this.position.x-10,this.position.y-10,20,20)
+		}
+		else
+			graphics.drawImage(greenlaserImage,this.position.x-30,this.position.y-30,60,60)
+		
+		//graphics.strokeStyle = '#FF0033';
+		//graphics.beginPath();
+		//graphics.arc(newx,newy,10,0,2*Math.PI)
+		//graphics.stroke()
 
 			
 		graphics.restore();
@@ -514,8 +541,14 @@ shipImage.src = './ship.png';
 var enemyImage = new Image();
 enemyImage.src = './bat.gif'
 
+var greenlaserImage = new Image();
+greenlaserImage.src = './laser.png'
+
 var bgImage = new Image();
 bgImage.src = './space.jpg'
+
+var orbImage = new Image();
+orbImage.src = './orb.png'
 
 // for monitors with a higher dpi
 if (config.graphics.is_hi_dpi) {
