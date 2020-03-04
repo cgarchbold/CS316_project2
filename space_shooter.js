@@ -191,7 +191,7 @@ class Player extends Body
 		this.score = 0;
 		this.timeAlive=0;
 		this.enemiesKilled=0;
-		this.poweredUp = false;
+		this.poweredUp = true;
 
 		// bind the input handler to this object
 		this.input_handler = new InputHandler(this);
@@ -254,8 +254,8 @@ class Player extends Body
 
 		if(this.controller.action_1 && this.shotTime <= 0){
 			//console.log("hLELO")
-			if(!poweredUP)
-			new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, false)
+			if(!this.poweredUp)
+				new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, false)
 
 			//new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, true)
 			else{
@@ -432,7 +432,7 @@ class laser extends Body {
 
 		//if(inVx==0)
 
-		this.velocity = {x: inVx/Math.abs(inVx+0.1)*this.speed,y: inVy/Math.abs(inVy+0.1)*this.speed}
+		this.velocity = {x: inVx/Math.abs(inVx+0.3)*this.speed,y: inVy/Math.abs(inVy+0.3)*this.speed}
 		console.log(this.velocity)
 	}
 
