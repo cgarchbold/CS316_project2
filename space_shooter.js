@@ -191,7 +191,7 @@ class Player extends Body
 		this.score = 0;
 		this.timeAlive=0;
 		this.enemiesKilled=0;
-		this.poweredUp = true;
+		this.poweredUp = false;
 
 		// bind the input handler to this object
 		this.input_handler = new InputHandler(this);
@@ -347,7 +347,7 @@ class Enemy extends Body {
 
 		this.ticker = Math.random()*5;
 
-		//start enemies above the canvas
+		//start ene	mies above the canvas
 		this.position = {
 			x: Math.random()*config.canvas_size.width,
 			y: 0 - 100
@@ -410,7 +410,7 @@ class Enemy extends Body {
 
 }
 /**
-* Represents an player body. Extends a Body by handling input binding and controller management.
+* Represents an laser body. Extends a Body by having a unique draw and movement pattern.
 * 
 * @typedef laser
 */
@@ -418,6 +418,7 @@ class laser extends Body {
 	speed=300;
 	angle=0;
 	isOrb=false;
+
 
 	constructor(inx,iny,inVx,inVy,angle, isOrb){
 		super();
@@ -436,6 +437,7 @@ class laser extends Body {
 		console.log(this.velocity)
 	}
 
+
 	update(delta_time){
 		super.update(delta_time);
 
@@ -444,6 +446,7 @@ class laser extends Body {
 		if(this.position.x > config.canvas_size.width || this.position.x < 0)
 			this.remove();
 	}
+
 
 	draw(graphics) {
 		let newx = this.position.x // this.half_size.width;
@@ -459,36 +462,35 @@ class laser extends Body {
 		}
 		else
 			graphics.drawImage(greenlaserImage,this.position.x-30,this.position.y-30,60,60)
-		
-		//graphics.strokeStyle = '#FF0033';
-		//graphics.beginPath();
-		//graphics.arc(newx,newy,10,0,2*Math.PI)
-		//graphics.stroke()
-
 			
 		graphics.restore();
 
 		// draw velocity lines
-		super.draw(graphics);
+		//super.draw(graphics);
 	}
 		
 
 
 }
 
+/**
+ * spawner object used to summon new enemies over a certain interval
+ * 
+ * @typedef spawner
+ */
+
 class spawner {
 
 	timespent = 0;
-	//entities_list;
 
 	constructor(){ 
 		this.timespent = 0;
-		//this.entities =entities;
+
+		new powerUp(300,400)
 	}
 
 	update(delta_time) {
 		this.timespent += delta_time;
-		//console.log(this.timespent)
 
 		if(this.timespent>5){
 			this.timespent=0;
@@ -501,38 +503,113 @@ class spawner {
 	
 }
 
+/**
+ * 
+ * class that acts as an object responsible for testing all relevant collisions
+ * 
+ * @typedef collisionChecker
+ * 
+ */
 class collisionChecker {
 
-	timeSpent = 0;
-
-	constructor(){
-		this.timespent = 0;
-	}
+	//empty constructor
+	constructor(){}
 
 	update(delta_time){
-		this.timeSpent +=delta_time;
 
+		//single loop, since player is always known
 		Object.values(entities).forEach(entity => {
 			
+			//check all enemies
 			if(entity instanceof Enemy){
 
-			if (player.position.x< entity.position.x + entity.size.width &&
-				player.position.x + player.size.width > entity.position.x &&
-				player.position.y < entity.position.y + entity.size.height &&
-				player.position.y + player.size.height > entity.position.y){
-					console.log("COLLISION DETECTED");
-					//remove(entities.get(i).id);
-					//entities.delete(entities.get(i).id);
+				//if collided with player
+				if (player.position.x< entity.position.x + entity.size.width &&
+					player.position.x + player.size.width > entity.position.x &&
+					player.position.y < entity.position.y + entity.size.height &&
+					player.position.y + player.size.height > entity.position.y){
+					
+					//console.log("COLLISION DETECTED");
+					
+					//kill enemy
+					entity.remove();
+					
+					//remove health
 					player.health -=5;
+				}
+			}
 
+			//check for powerUP
+			if(entity instanceof powerUp){
 
+				//if collided with player
+				if (player.position.x< entity.position.x + entity.size.width &&
+					player.position.x + player.size.width > entity.position.x &&
+					player.position.y < entity.position.y + entity.size.height &&
+					player.position.y + player.size.height > entity.position.y){
+						
+					//remove powerUp
+					entity.remove();
+						
+					//remove health
+					player.poweredUp = true
 				}
 			}
 		});
+
+		//double loop, for each entity check every other entity
+		Object.values(entities).forEach(eni => {
+			Object.values(entities).forEach(las => {
 			
+			//if the set of objects is a laser and an enemy
+			if(eni instanceof Enemy && las instanceof laser)
+				
+				//check for collision
+				if (eni.position.x< las.position.x + las.size.width &&
+					eni.position.x + eni.size.width > las.position.x &&
+					eni.position.y < las.position.y + las.size.height &&
+					eni.position.y + eni.size.height > las.position.y){
+
+					//remove enemy and laser
+					eni.remove();
+					las.remove();
+
+					//add to kill counter
+					player.enemiesKilled += 1;
+				}
+			});
+		});
+
+		//updates score every collision check
+		player.score = Math.floor(30 * player.enemiesKilled + player.timeAlive)
 	}
 
+}
 
+/**
+* Represents an powerup body. Extends a Body changing player's poweredUp status when removed
+* 
+* @typedef powerUp
+*/
+class powerUp extends Body {
+
+	constructor(inx,iny){
+		super();
+
+		this.position = {
+			x: inx ,
+			y: iny 
+		};
+	}
+
+	draw(graphics) {
+
+		graphics.drawImage(powerUpImage,this.position.x-10,this.position.y-10,20,20)
+			
+		// draw velocity lines
+		super.draw(graphics);
+	}
+		
 
 
 }
@@ -580,6 +657,9 @@ enemyImage.src = './bat.gif'
 
 var greenlaserImage = new Image();
 greenlaserImage.src = './laser.png'
+
+var powerUpImage = new Image();
+powerUpImage.src = './powerUp.png'
 
 var bgImage = new Image();
 bgImage.src = './space.jpg'
@@ -704,6 +784,8 @@ function draw(graphics) {
  * 
  * @param {Number} curr_time Current time in milliseconds
  */
+
+
 function loop(curr_time) {
 	// convert time to seconds
 	curr_time /= 1000;
@@ -724,11 +806,20 @@ function loop(curr_time) {
 		last_time = curr_time;
 		loop_count++;
 
+		/**
+		 * Below are the statements for displaying the game statistics.
+		 * @param {none}
+		 * @return {void}
+		 * 
+		 */
+		
+
 		game_state.innerHTML = `<font color="red"> loop count ${loop_count} <br />
 								Time till next Shot: ${player.shotTime.toFixed(2)}<br />
 								Time Alive: ${player.timeAlive.toFixed(2)}<br />
 								Enemies killed: ${player.enemiesKilled}<br />
-								Score: ${player.score} <font>`;
+								Score: ${player.score}<br />
+								Health: ${player.health} <font>`;
 		
 	}
 
