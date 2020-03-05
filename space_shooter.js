@@ -161,7 +161,7 @@ class Body {
 
 /**
  * Represents an player body. Extends a Body by handling input binding and controller management.
- * 
+ * @inheritdoc 
  * @typedef Player
  */
 class Player extends Body 
@@ -339,7 +339,7 @@ class Player extends Body
 
 /**
 * Represents an player body. Extends a Body by handling input binding and controller management.
-* 
+* @inheritdoc 
 * @typedef Enemy
 */
 class Enemy extends Body {
@@ -416,7 +416,7 @@ class Enemy extends Body {
 }
 /**
 * Represents an laser body. Extends a Body by having a unique draw and movement pattern.
-* 
+* @inheritdoc 
 * @typedef laser
 */
 class laser extends Body {
@@ -425,7 +425,7 @@ class laser extends Body {
 	isOrb=false;
 
 
-	constructor(inx,iny,inVx,inVy,angle, isOrb){
+	constructor(inx,iny,inVx,inVy,angle,isOrb){
 		super();
 
 		this.isOrb = isOrb;
@@ -483,7 +483,6 @@ class laser extends Body {
  * 
  * @typedef spawner
  */
-
 class spawner {
 
 	timespent = 0;
@@ -510,10 +509,10 @@ class spawner {
 
 /**
  * 
- * class that acts as an object responsible for testing all relevant collisions
+ * Class that acts as an object responsible for testing all relevant collisions
  * 
  * @typedef collisionChecker
- * 
+ *  
  */
 class collisionChecker {
 
@@ -595,6 +594,7 @@ class collisionChecker {
 * Represents an powerup body. Extends a Body changing player's poweredUp status when removed
 * 
 * @typedef powerUp
+* @inheritdoc  
 */
 class powerUp extends Body {
 
@@ -608,9 +608,7 @@ class powerUp extends Body {
 	}
 
 	draw(graphics) {
-
 		graphics.drawImage(powerUpImage,this.position.x-10,this.position.y-10,20,20)
-			
 		// draw velocity lines
 		super.draw(graphics);
 	}
@@ -789,8 +787,6 @@ function draw(graphics) {
  * 
  * @param {Number} curr_time Current time in milliseconds
  */
-
-
 function loop(curr_time) {
 	// convert time to seconds
 	curr_time /= 1000;
@@ -831,6 +827,13 @@ function loop(curr_time) {
 	window.requestAnimationFrame(loop);
 }
 
+/**
+ * This is the main driver of the game. This is called by the window requestAnimationFrame event.
+ * This function calls the update and draw methods at static intervals. That means regardless of
+ * how much time passed since the last time this function was called by the window the delta time
+ * passed to the draw and update functions will be stable.
+ * 
+ */
 function start() {
 	entities = [];
 	queued_entities_for_removal = [];
