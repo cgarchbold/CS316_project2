@@ -259,13 +259,16 @@ class Player extends Body
 
 			//new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, true)
 			else{
-				let newvx = (this.velocity.x + this.velocity.y) / Math.sqrt(2)
-				let newvy = (this.velocity.y - this.velocity.x) / Math.sqrt(2)
-				let newvx2 = (this.velocity.x - this.velocity.y) / Math.sqrt(2)
-				let newvy2 = (this.velocity.y + this.velocity.x) / Math.sqrt(2)
+				let angleShot = Math.PI/11
+				let newvx = this.velocity.x * Math.cos(angleShot) - this.velocity.y * Math.sin(angleShot)
+				console.log(newvx)
+				let newvy = this.velocity.y * Math.cos(angleShot) + this.velocity.x * Math.sin(angleShot) 
 
-				new laser(this.position.x,this.position.y,newvx,newvy,this.angle+Math.Pi/4, true)
-				new laser(this.position.x,this.position.y,newvx2,newvy2,this.angle-Math.PI/4, true)
+				let newvx2 = this.velocity.x * Math.cos(angleShot) + this.velocity.y * Math.sin(angleShot) 
+				let newvy2 = this.velocity.y * Math.cos(angleShot) - this.velocity.x * Math.sin(angleShot) 
+
+				new laser(this.position.x,this.position.y,newvx,newvy,this.angle+angleShot, true)
+				new laser(this.position.x,this.position.y,newvx2,newvy2,this.angle-angleShot, true)
 				new laser(this.position.x,this.position.y,this.velocity.x,this.velocity.y,this.angle, true)
 			}
 
@@ -310,22 +313,24 @@ class Player extends Body
 		}
 		else if(this.controller.move_x == -1 && this.controller.move_y == 1){
 			this.velocity.x = -this.speed*Math.cos(Math.PI/4);
-			this.velocity.y = this.speed*Math.cos(Math.PI/4);
+			this.velocity.y = this.speed*Math.sin(Math.PI/4);
 			this.angle = 3*Math.PI/4;
 		}
 		else if(this.controller.move_x == -1 && this.controller.move_y == -1){
 			this.velocity.x = -this.speed*Math.cos(Math.PI/4);
-			this.velocity.y = -this.speed*Math.cos(Math.PI/4);
+			this.velocity.y = -this.speed*Math.sin(Math.PI/4);
+			
 			this.angle = 5*Math.PI/4;
 		}
 		else if(this.controller.move_x == 1 && this.controller.move_y == 1){
 			this.velocity.x = this.speed*Math.cos(Math.PI/4);
-			this.velocity.y = this.speed*Math.cos(Math.PI/4);
+			this.velocity.y = this.speed*Math.sin(Math.PI/4);
+			
 			this.angle = Math.PI/4;
 		}
 		else if(this.controller.move_x == 1 && this.controller.move_y == -1){
 			this.velocity.x = this.speed*Math.cos(Math.PI/4);
-			this.velocity.y = -this.speed*Math.cos(Math.PI/4);
+			this.velocity.y = -this.speed*Math.sin(Math.PI/4);
 			this.angle = 7*Math.PI/4;
 		}
 	}
@@ -415,7 +420,7 @@ class Enemy extends Body {
 * @typedef laser
 */
 class laser extends Body {
-	speed=300;
+	speed=2;
 	angle=0;
 	isOrb=false;
 
@@ -433,7 +438,7 @@ class laser extends Body {
 
 		//if(inVx==0)
 
-		this.velocity = {x: inVx/Math.abs(inVx+0.3)*this.speed,y: inVy/Math.abs(inVy+0.3)*this.speed}
+		this.velocity = {x: inVx*this.speed,y: inVy*this.speed}
 		console.log(this.velocity)
 	}
 
