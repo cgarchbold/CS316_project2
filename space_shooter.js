@@ -501,6 +501,43 @@ class spawner {
 	
 }
 
+class collisionChecker {
+
+	timeSpent = 0;
+
+	constructor(){
+		this.timespent = 0;
+	}
+
+	update(delta_time){
+		this.timeSpent +=delta_time;
+
+		Object.values(entities).forEach(entity => {
+			
+			if(entity instanceof Enemy){
+
+			if (player.position.x< entity.position.x + entity.size.width &&
+				player.position.x + player.size.width > entity.position.x &&
+				player.position.y < entity.position.y + entity.size.height &&
+				player.position.y + player.size.height > entity.position.y){
+					console.log("COLLISION DETECTED");
+					//remove(entities.get(i).id);
+					//entities.delete(entities.get(i).id);
+					player.health -=5;
+
+
+				}
+			}
+		});
+			
+	}
+
+
+
+
+}
+
+
 
 /* 
 ------------------------------
@@ -709,6 +746,7 @@ function start() {
 	enemy_spawner = new spawner()
 	
 	// collision_handler = your implementation
+	collision_handler = new collisionChecker();
 }
 
 // start the game
